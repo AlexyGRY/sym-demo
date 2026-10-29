@@ -1,0 +1,53 @@
+name: Qualité du code
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - develop
+jobs:
+  code-quality:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Récupérer le dépôt
+        uses: actions/checkout@v7
+
+      - name: Installer PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, intl, pdo_sqlite
+
+      - name: Récupérer le cache composer
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+      - name: Mise en cache du composer
+        uses: actions/cache@v6
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Installer les dépendances composer
+        run: composer install --no-progress --no-interaction --prefer-dist
+
+      - name: Vérifier le formatage PHP
+        run: vendor/bin/php-cs-fixer fix --dry-run --diff
+
+      - name: Analyser le code avec PHPStan
+        run: vendor/bin/phpstan analyse --no-progress
+
+      - name: Exécuter les tests PHPUnit
+        run: php bin/phpunit
+
+      - name: Vérifier les templates Twig
+        run: php bin/console lint:twig templates/
+
+      - name: Vérifier les fichiers YAML
+        run: php bin/console lint:yaml config/ --parse-tags
+
+      - name: Vérifier le container Symfony
+        run: php bin/console lint:container --no-debug
