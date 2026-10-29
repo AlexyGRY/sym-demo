@@ -38,3 +38,4 @@ jobs:
       
       - name: Lancer l'audit de sécurité
         run: composer audit
+

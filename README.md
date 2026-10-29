@@ -65,6 +65,8 @@ vendor/bin/php-cs-fixer fix --dry-run
 **Vérification et correction :** Cette commande permet de vérifier le code et d'appliquer automatiquement les corrections nécessaires.
 ```bash
 vendor/bin/php-cs-fixer fix
+
+php bin/phpunit --log-junit php-report.xml
 ```
 
 
