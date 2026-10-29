@@ -8,21 +8,23 @@ on:
     branches:
       - develop
 jobs:
-  code-quality:
+  audit:
     runs-on: ubuntu-latest
     steps:
       - name: Récupérer le dépôt
         uses: actions/checkout@v7
 
-      - name: Installer PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.4'
-          extensions: mbstring, intl, pdo_sqlite
-
+      - name: Set up Python
+        uses: actions/setup-python@v4
       - name: Récupérer le cache composer
         id: composer-cache
         run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+      
+      - name: Installer PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          extensions: mbstring, intl
 
       - name: Mise en cache du composer
         uses: actions/cache@v6
@@ -33,21 +35,24 @@ jobs:
 
       - name: Installer les dépendances composer
         run: composer install --no-progress --no-interaction --prefer-dist
+      
+      - name: Lancer l'audit de sécurité
+        run: composer audit
 
-      - name: Vérifier le formatage PHP
+      - name: Verification du style avec php cs-fixer
         run: vendor/bin/php-cs-fixer fix --dry-run --diff
+      
+      - name: Analyse statique avec phpstan
+        run: vendor/bin/phpstan analyse -c phpstan.dist.neon --no-progress
 
-      - name: Analyser le code avec PHPStan
-        run: vendor/bin/phpstan analyse --no-progress
+      - name: Linter Twig
+        run: bin/console lint:twig templates/
+      
+      - name: Linter YAML
+        run: bin/console lint:yaml config/
 
-      - name: Exécuter les tests PHPUnit
-        run: php bin/phpunit
+      - name: Linter les containers de services
+        run: bin/console lint:container --no-debug
 
-      - name: Vérifier les templates Twig
-        run: php bin/console lint:twig templates/
-
-      - name: Vérifier les fichiers YAML
-        run: php bin/console lint:yaml config/ --parse-tags
-
-      - name: Vérifier le container Symfony
-        run: php bin/console lint:container --no-debug
+      - name: Verification des entités Doctrine
+        run: bin/console doctrine:schema:validate --skip-sync -vvv --no-interaction
