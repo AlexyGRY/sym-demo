@@ -141,7 +141,7 @@ jobs:
       - name: Login DockerHub
         uses: docker/login-action@v3
         with:
-          username: ${{ vars.DOCKER_USER }}
+          username: ${{ secrets.DOCKER_USER }}
           password: ${{ secrets.DOCKER_TOKEN }}
       
       - name: Build and push Docker image
@@ -149,5 +149,5 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ vars.DOCKER_USER }}/sym-demo:latest
+          tags: ${{ secrets.DOCKER_USER }}/sym-demo:latest
 
