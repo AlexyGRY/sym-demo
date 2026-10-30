@@ -106,24 +106,22 @@ jobs:
       steps:
         - name: Récupérer le dépôt
           uses: actions/checkout@v7
-        - name: Installer les dépendances Composer
-          run: composer install --no-progress --no-interaction
         - name: Récupérer le cache Composer
           id: composer-cache
           run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
-          
         - name: Installer PHP
           uses: shivammathur/setup-php@v2
           with:
-            php-version: '8.5'
-            extensions: mbstring, intl
-
-        - name: Mise en cache du Composer
+              php-version: '8.5'
+              extensions: mbstring, intl
+        - name: Mise en cache
           uses: actions/cache@v6
           with:
             path: ${{ steps.composer-cache.outputs.dir }}
             key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
             restore-keys: ${{ runner.os }}-composer-
+        - name: Installer les dépendances Composer
+          run: composer install --no-progress --no-interaction --prefer-dist
         - name: Créer la base de données
           run: |
             php bin/console doctrine:database:create --no-interaction --if-not-exists
