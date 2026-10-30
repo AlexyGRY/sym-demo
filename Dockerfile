@@ -16,7 +16,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     zip \
     && rm -rf /var/lib/apt/lists/*
 
-# ── PHP extensions (install-php-extensions gère les dépendances) ────
+# ── PHP extensions (install-php-extensions gère les dépendances) ───
 ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
 RUN chmod +x /usr/local/bin/install-php-extensions
 
