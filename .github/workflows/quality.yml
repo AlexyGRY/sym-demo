@@ -132,4 +132,22 @@ jobs:
 
         - name: Exécuter les tests d'intégration
           run: php bin/phpunit
+  build-push:
+    needs: test-integration
+    runs-on: ubuntu-latest
+    steps:
+      - name: Récupérer le dépôt
+        uses: actions/checkout@v7
+      - name: Login DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ vars.DOCKER_USER }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+      
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          push: true
+          tags: ${{ vars.DOCKER_USER }}/sym-demo:latest
 
