@@ -151,6 +151,7 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKERHUB_USER }}/sym-demo:latest
   deploy:
+    needs: test-integration
     runs-on: ubuntu-latest
     continue-on-error: false
     steps:
