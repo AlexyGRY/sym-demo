@@ -106,6 +106,8 @@ jobs:
       steps:
         - name: Récupérer le dépôt
           uses: actions/checkout@v7
+        - name: Installer les dépendances Composer
+          run: composer install --no-progress --no-interaction
         - name: Récupérer le cache Composer
           id: composer-cache
           run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
