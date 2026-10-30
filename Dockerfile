@@ -3,7 +3,7 @@ FROM php:8.5-apache
 ARG TIMEZONE="Europe/Paris"
 ENV DEBIAN_FRONTEND=noninteractive
 
-# ── System tools ────────────────────────────────────────────────────
+# ── System tools ───────────────────────────────────────────────────
 RUN apt-get update && apt-get install -y --no-install-recommends \
     acl \
     ca-certificates \
